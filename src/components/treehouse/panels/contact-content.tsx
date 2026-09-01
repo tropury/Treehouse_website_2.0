@@ -34,7 +34,7 @@ export function ContactContent({ visible }: ContactContentProps) {
   const ticker = [...MARQUEE_WORDS, ...MARQUEE_WORDS];
 
   return (
-    <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-12 md:px-12 md:pt-16">
+    <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-20 md:px-12 md:pt-24">
       {/* Marquee background ticker */}
       <div
         className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none overflow-hidden"
@@ -64,9 +64,6 @@ export function ContactContent({ visible }: ContactContentProps) {
           contact
         </span>
         <span className="h-px flex-1 bg-white/20" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
-          05 — Connect
-        </span>
       </motion.div>
 
       <motion.h2

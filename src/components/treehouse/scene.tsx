@@ -6,46 +6,43 @@ import { useDeepLink } from "./lib/use-deep-link";
 import { DarkPanel } from "./panels/dark-panel";
 import { HeroPanel } from "./panels/hero-panel";
 import { BlueStage } from "./panels/blue-stage";
-import { NavigationOrb } from "./navigation-orb";
-import { ViewIndicator } from "./view-indicator";
+import { HubButton } from "./hub-button";
+import { MenuOverlay } from "./menu-overlay";
 import { MagneticCursor } from "./magnetic-cursor";
 import { PageIntro } from "./page-intro";
-import { SoundToggle } from "./sound-toggle";
 import { KeyboardHints } from "./keyboard-hints";
-import { BackToHome } from "./back-to-home";
 import { ViewProgress } from "./view-progress";
 import { StatusTicker } from "./status-ticker";
 import { ScrollProgressIndicator } from "./scroll-progress-indicator";
-import { NewsletterSignup } from "./newsletter-signup";
-import { ThemeToggle } from "./theme-toggle";
 import { CookieConsent } from "./cookie-consent";
 import { CommandPalette } from "./command-palette";
 import { BackToTop } from "./back-to-top";
 import { PortfolioLightbox } from "./panels/portfolio-lightbox";
 import { portfolio } from "./data/portfolio";
 import type { PortfolioItem } from "./types";
-import { siteConfig } from "./data/site";
 
 /**
  * The TreeHouse scene.
  *
  * Composes the split-screen hero (dark + white panels), the expanding
- * blue stage (portfolio / studio / lab / contact), the navigation
- * controls, the custom cursor, a one-time page intro, an ambient sound
- * toggle, and the portfolio detail lightbox into a single cohesive,
- * keyboard-accessible experience.
+ * blue stage (portfolio / studio / lab / contact), the menu-first
+ * navigation (a hub button that slides up and opens the split menu —
+ * portfolio on one side, contact on the other, like the original
+ * studio site), the custom cursor, a one-time page intro, and the
+ * portfolio detail lightbox into a single cohesive, keyboard-accessible
+ * experience.
  *
  * The lightbox state lives here (not inside the portfolio content) so
  * that deep links (`#work-<id>`) can open it even when the visitor
  * lands on the hero view — the scene switches to the portfolio view
  * and opens the item.
  *
- * Layout: a full-height flex column — `main` flexes to fill the viewport
- * (hosting the absolutely-positioned panels) while the slim footer sits
- * beneath it, always pinned to the bottom.
+ * Layout: a full-height flex column — `main` flexes to fill the
+ * viewport, hosting the absolutely-positioned panels. There is no
+ * footer bar; the status ticker is the only strip beneath the stage.
  */
 export function TreeHouseScene() {
-  const { view, next, goTo } = useScene();
+  const { view, goTo, menuOpen, openMenu, closeMenu } = useScene();
   const isHero = view === "hero";
 
   // Portfolio lightbox state — owned by the scene so deep links work.
@@ -100,20 +97,11 @@ export function TreeHouseScene() {
       {/* Custom magnetic cursor (desktop only) */}
       <MagneticCursor />
 
-      {/* Ambient sound control */}
-      <SoundToggle />
-
-      {/* Theme (light/dark) toggle */}
-      <ThemeToggle />
-
       {/* Keyboard shortcut legend */}
       <KeyboardHints />
 
       {/* Scroll-position indicator for long panels */}
       <ScrollProgressIndicator />
-
-      {/* Back-to-hero affordance (hidden on hero view) */}
-      <BackToHome visible={!isHero} onHome={() => goTo("hero")} />
 
       {/* Back-to-top button (appears when scrolling long panels) */}
       <BackToTop />
@@ -124,11 +112,29 @@ export function TreeHouseScene() {
         <HeroPanel active={isHero} />
 
         {/* Expanding blue stage hosting portfolio / studio / lab / contact */}
-        <BlueStage view={view} portfolioHandlers={portfolioHandlers} />
+        <BlueStage
+          view={view}
+          portfolioHandlers={portfolioHandlers}
+          onHome={() => goTo("hero")}
+        />
 
-        {/* Navigation controls */}
-        <NavigationOrb view={view} onNext={next} />
-        <ViewIndicator view={view} onGoTo={goTo} />
+        {/* Split menu — portfolio on one side, contact on the other */}
+        <MenuOverlay
+          open={menuOpen}
+          view={view}
+          onChoose={goTo}
+          onClose={closeMenu}
+          onHome={() => goTo("hero")}
+        />
+
+        {/* The hub ball — slides up from the hero, parks right in views */}
+        <HubButton
+          menuOpen={menuOpen}
+          isHero={isHero}
+          view={view}
+          onToggle={menuOpen ? closeMenu : openMenu}
+          onGoTo={goTo}
+        />
       </main>
 
       {/* Portfolio detail lightbox — owned by the scene for deep-link support */}
@@ -143,21 +149,6 @@ export function TreeHouseScene() {
 
       {/* Ambient "studio is alive" status ticker */}
       <StatusTicker />
-
-      {/* Slim status bar / footer — pinned to the bottom */}
-      <footer className="relative z-40 shrink-0 border-t border-zinc-200/70 bg-white/80 px-6 py-3 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 text-center md:flex-row md:text-left">
-          <p className="font-serif text-xs italic text-zinc-500">
-            {siteConfig.title} — {siteConfig.heroHeadline}
-          </p>
-          <div className="flex items-center gap-4">
-            <NewsletterSignup />
-            <p className="hidden text-[11px] uppercase tracking-[0.25em] text-zinc-400 md:block">
-              Architecture · Interior · Visual Persuasion
-            </p>
-          </div>
-        </div>
-      </footer>
 
       {/* Cookie consent banner (first visit only) */}
       <CookieConsent />

@@ -20,8 +20,6 @@ export interface PortfolioItem {
   accent?: string;
   /** Optional image path (under /public). When present, used as the tile art. */
   image?: string;
-  /** Optional wireframe / clay-render image for the before/after slider. */
-  beforeImage?: string;
   /** Short descriptor shown in the detail lightbox. Verbatim-safe copy. */
   description?: string;
   /** Year the work was produced. */

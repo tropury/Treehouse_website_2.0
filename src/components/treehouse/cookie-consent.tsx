@@ -71,9 +71,9 @@ export function CookieConsent() {
                   Cookies &amp; privacy
                 </h3>
                 <p className="mt-1 text-xs leading-relaxed text-zinc-500">
-                  We use a few cookies to remember your sound and theme
-                  preferences. No tracking, no third-party analytics. Choose
-                  what you&apos;re comfortable with.
+                  We use a single cookie to remember your choice — no
+                  tracking, no third-party analytics. Nothing else is
+                  stored.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button

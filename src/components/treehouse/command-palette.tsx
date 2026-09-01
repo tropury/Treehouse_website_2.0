@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import {
   CommandDialog,
   CommandEmpty,
@@ -18,10 +17,7 @@ import {
   Home,
   Layers,
   Mail,
-  Moon,
   Sparkles,
-  Sun,
-  Volume2,
 } from "lucide-react";
 import { views } from "./data/site";
 import { portfolio } from "./data/portfolio";
@@ -38,15 +34,13 @@ interface CommandPaletteProps {
  * CommandPalette — a Cmd+K / Ctrl+K power-user launcher.
  *
  * Opens a modal with fuzzy search across views, portfolio works, and
- * quick actions (toggle theme, toggle sound, back to hero). Selecting
- * a result navigates or triggers the action. Pairs naturally with the
- * existing keyboard-hints legend.
+ * a back-to-hero action. Selecting a result navigates or triggers the
+ * action. Pairs naturally with the existing keyboard-hints legend.
  *
  * Triggered by Cmd+K (macOS) / Ctrl+K (other).
  */
 export function CommandPalette({ goTo, openWork }: CommandPaletteProps) {
   const [open, setOpen] = useState(false);
-  const { theme, setTheme, resolvedTheme } = useTheme();
 
   // Global Cmd+K / Ctrl+K shortcut.
   useEffect(() => {
@@ -67,15 +61,6 @@ export function CommandPalette({ goTo, openWork }: CommandPaletteProps) {
     // Defer so the dialog closes before the action runs.
     setTimeout(fn, 50);
   }, []);
-
-  const toggleTheme = () => {
-    const isDark = (resolvedTheme ?? theme) === "dark";
-    setTheme(isDark ? "light" : "dark");
-  };
-
-  const toggleSound = () => {
-    window.dispatchEvent(new CustomEvent("th-toggle-sound"));
-  };
 
   return (
     <CommandDialog
@@ -135,22 +120,6 @@ export function CommandPalette({ goTo, openWork }: CommandPaletteProps) {
         {/* Actions */}
         <CommandGroup heading="Actions">
           <CommandItem
-            value="toggle theme dark light mode"
-            onSelect={() => run(toggleTheme)}
-          >
-            <Sun className="h-4 w-4 text-zinc-400" />
-            <span>Toggle theme</span>
-            <CommandShortcut>Theme</CommandShortcut>
-          </CommandItem>
-          <CommandItem
-            value="toggle sound ambient audio mute"
-            onSelect={() => run(toggleSound)}
-          >
-            <Volume2 className="h-4 w-4 text-zinc-400" />
-            <span>Toggle ambient sound</span>
-            <CommandShortcut>Sound</CommandShortcut>
-          </CommandItem>
-          <CommandItem
             value="back to home hero studio start"
             onSelect={() => run(() => goTo("hero"))}
           >
@@ -163,6 +132,3 @@ export function CommandPalette({ goTo, openWork }: CommandPaletteProps) {
     </CommandDialog>
   );
 }
-
-// Keep Moon imported for tree-shaking friendliness (unused in render).
-export { Moon };

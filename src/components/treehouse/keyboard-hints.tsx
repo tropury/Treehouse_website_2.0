@@ -14,10 +14,10 @@ interface Shortcut {
 /** The full shortcut set. Kept here so it stays close to the legend UI. */
 const SHORTCUTS: Shortcut[] = [
   { keys: ["⌘", "K"], description: "Open command palette" },
-  { keys: ["→", "Space"], description: "Next view" },
+  { keys: ["→", "Space"], description: "Open the menu" },
   { keys: ["←"], description: "Previous view" },
   { keys: ["1", "2", "3", "4", "5"], description: "Jump to a view" },
-  { keys: ["Esc"], description: "Close dialog" },
+  { keys: ["Esc"], description: "Close menu / dialog" },
   { keys: ["?"], description: "Toggle this panel" },
 ];
 

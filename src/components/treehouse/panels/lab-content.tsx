@@ -147,7 +147,7 @@ export function LabContent({ visible }: LabContentProps) {
       onDragEnd={onDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-      <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-12 md:px-16 md:pt-16">
+      <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-20 md:px-16 md:pt-24">
         {/* Section label */}
         <motion.div
           className="mb-3 flex items-baseline gap-4"
@@ -159,9 +159,6 @@ export function LabContent({ visible }: LabContentProps) {
             lab
           </span>
           <span className="h-px flex-1 bg-white/20" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
-            04 — Mood Board
-          </span>
         </motion.div>
 
         {/* Headline */}

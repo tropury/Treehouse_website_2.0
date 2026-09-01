@@ -4,9 +4,6 @@ import type { PortfolioItem } from "../types";
  * Portfolio works. Data-driven so new pieces can be appended without
  * touching any component code. Gradients remain as a graceful fallback
  * if an image is unavailable.
- *
- * Items with a `beforeImage` expose an interactive before/after slider
- * (wireframe → final render) in the detail lightbox.
  */
 export const portfolio: PortfolioItem[] = [
   {
@@ -16,7 +13,6 @@ export const portfolio: PortfolioItem[] = [
     gradient: "from-zinc-100 to-zinc-300",
     accent: "#1d4ed8",
     image: "/works/work-1.png",
-    beforeImage: "/works/work-1-wire.png",
     year: "2024",
     description:
       "A monolithic concrete residence where raw material meets warm interior light at dusk.",
@@ -35,7 +31,6 @@ export const portfolio: PortfolioItem[] = [
     gradient: "from-blue-50 to-blue-100",
     accent: "#2563eb",
     image: "/works/work-2.png",
-    beforeImage: "/works/work-2-wire.png",
     year: "2024",
     description:
       "An open-plan living space balancing natural wood, daylight, and scandinavian restraint.",
@@ -54,7 +49,6 @@ export const portfolio: PortfolioItem[] = [
     gradient: "from-stone-100 to-stone-300",
     accent: "#1e3a8a",
     image: "/works/work-3.png",
-    beforeImage: "/works/work-3-wire.png",
     year: "2023",
     description:
       "A contemporary villa rendered at blue hour, its infinity pool mirroring the geometry above.",
@@ -73,7 +67,6 @@ export const portfolio: PortfolioItem[] = [
     gradient: "from-slate-100 to-slate-300",
     accent: "#3b82f6",
     image: "/works/work-4.png",
-    beforeImage: "/works/work-4-wire.png",
     year: "2023",
     description:
       "A minimalist bedroom in soft morning light — Japandi calm, linen, concrete, and wood.",

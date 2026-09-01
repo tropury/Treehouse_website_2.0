@@ -112,11 +112,6 @@ export function DarkPanel({ active }: DarkPanelProps) {
         style={{ x: glowX }}
       />
 
-      {/* Top-left corner index */}
-      <div className="absolute left-6 top-6 z-10 hidden font-serif text-[10px] uppercase tracking-[0.3em] text-th-cream/40 md:block">
-        Est. Studio
-      </div>
-
       {/* Bottom corner coordinates */}
       <div className="absolute bottom-6 left-6 z-10 hidden font-mono text-[10px] tracking-wider text-th-cream/30 md:block">
         — 2025

@@ -418,3 +418,70 @@ Task: Assess project status, QA via agent-browser, then add more styling detail 
 - **Back-to-top button on mobile**: hidden on mobile (`md:block` not applied — it uses responsive positioning). Actually it shows on all sizes since it's a floating button. Acceptable.
 - **Email notification**: still no email on newsletter signup or contact inquiry. Resend integration remains the top backend next-step (carried over since round 5).
 - **Next-phase ideas**: (a) email notification (Resend); (b) per-project OG images + a `/projects/[slug]` route; (c) a "featured project" hero tile; (d) i18n with next-intl; (e) rate limiting; (f) a production build to stabilise the dev-server OOM; (g) command palette "recently viewed" section.
+
+---
+Task ID: restore-1
+Agent: main (Z.ai Code) — session restore
+Task: Restore the project environment after conversation loss. User provided the GitHub repo (https://github.com/tropury/Treehouse_website_2.0) and asked to clone it and continue adjustments.
+
+Work Log:
+- Cloned https://github.com/tropury/Treehouse_website_2.0.git and read the full worklog (Tasks 1–11) to recover context: 5-view immersive portfolio (hero/portfolio/studio/lab/contact) with 28+ features.
+- Initialized the fullstack environment, then moved all project files (src, prisma, public, db, upload, configs, worklog) to the workspace root /home/z/my-project. Preserved the repo's .git so origin points to the user's GitHub for future pushes.
+- bun install: no changes needed (846 packages). db/custom.db cloned intact with prior data (newsletter signups + contact inquiries from Aug 27).
+- Regenerated Prisma Client (bun run db:generate) — the scaffold-generated client lacked the NewsletterSignup/ContactInquiry models — and restarted the dev server to pick it up. DB schema already in sync (db:push confirmed "already in sync").
+- QA via agent-browser: all 5 views render (hero split-screen, portfolio grid + filters, studio radar chart, lab mood board, contact socials + multi-step form); cookie consent appears + accepts; portfolio lightbox opens with full spec sheet; status ticker rotates; no console errors.
+- API tests: POST /api/newsletter → 201 + persisted (honeypot spam silently dropped, DB unchanged); POST /api/contact → 201 + persisted (QA Test / qa@test.com).
+- bun run lint → clean.
+
+Stage Summary:
+- Environment fully restored at /home/z/my-project with git remote = user's GitHub repo. Dev server healthy (GET / 200), all 28+ features verified working, database data intact. Ready for the next round of adjustments.
+
+---
+Task ID: nav-1
+Agent: main (Z.ai Code) — menu-first navigation redesign
+Task: Replace the sequential "advance" navigation with the original site's menu-first model: the hero button slides up and opens a split menu (portfolio on one side, contact on the other), faithfully replicating https://www.treehousestudio.com.br/.
+
+Work Log:
+- Analysed the live reference site with agent-browser: hero hosts a plain blue circle (bg-blue-600, w-16, shadow-xl) at bottom-centre; clicking it slides the button UP to the top-centre where it turns charcoal (zinc-900) while a blue portfolio-preview panel sweeps in from the left and a white contact panel (socials) from the right; "portfolio"/"contact" labels flank the button; vertical "SEEKING VISUAL" marker on the white side near the seam; easing cubic-bezier(0.76,0,0.24,1) over 700ms.
+- `lib/use-scene.ts`: added `menuOpen` state + `openMenu`/`closeMenu`; `goTo`/`next`/`prev` now close the menu; keyboard reworked — Space/Enter/→ open the menu (the forward gesture), ← jumps back, digits 1–9 jump (also while the menu is open), Esc closes the menu; keys are still deferred to aria-modal dialogs (lightbox/command palette).
+- NEW `hub-button.tsx` (replaces `navigation-orb.tsx`, deleted): single morphing control — hero: bottom-centre plain blue circle with pulse ring + "menu" tooltip; menu open: top-centre charcoal; full views: parked top-centre to re-open the menu. Position + background animate with the studio easing (0.7s); Plus/X hover icons for affordance; correct aria-label/expanded/haspopup.
+- NEW `menu-overlay.tsx`: split menu — blue panel (th logo, giant italic serif watermark, 2×2 grid of the first 4 works with hover zoom + title chips, whole panel clickable → portfolio) sweeps from the left (desktop) / top (mobile); white panel (paper grain, 5 socials as big grey names darkening on hover with tag reveal, "start a project" serif affordance, PROCESS/LAB/CLOSE mono link row docked at the bottom) sweeps from the right (desktop) / bottom (mobile); socials stopPropagation and open externally; flanking PORTFOLIO/CONTACT mono labels beside the hub; staggered entrances; role="dialog" with aria-label.
+- `scene.tsx`: wired HubButton + MenuOverlay, removed NavigationOrb; BackToHome hidden while the menu is open; ViewIndicator dots kept as the direct-jump control.
+- `keyboard-hints.tsx`: legend updated ("→ / Space — Open the menu", "Esc — Close menu / dialog").
+- Fixed a pre-existing broken asset: data referenced `/works/work-1.png` but the file was `work-01.png` (404 in the first menu tile + portfolio grid + lightbox). `git mv public/works/work-01.png public/works/work-1.png`.
+- Disambiguated the menu's "close" link aria-label to "Dismiss menu" (was clashing with the hub's "Close menu").
+- QA (agent-browser): fresh load clean (no console/page errors; a transient hydration warning during HMR editing disappears on reload); hub slides 88%→32px and blue→zinc-900; menu opens over hero AND over full views; portfolio + contact choices navigate correctly; Esc closes and the button slides back down; ArrowRight opens the menu; mobile (390×844) stacks the split vertically with the button at the top; first menu tile image now loads (no 404); all prior features (filters, lightbox, forms, ticker) intact. `bun run lint` clean.
+
+Stage Summary:
+- Navigation model is now choose-based (menu-first), matching the original site: hero button slides up → split menu (portfolio | contact) → choose. Studio/lab reachable via the menu's secondary links, the dots, and the command palette. Fixed broken work-1 image asset. Committed to git.
+
+---
+Task ID: nav-2
+Agent: main (Z.ai Code) — navigation polish round 2
+Task: User feedback on the new navigation (4 items): (1) remove the "Studio" pill button — the logo itself should return home; (2) the ball must slide to the top-RIGHT when a view opens (like the original site), turning cream, and clicking it must bring back the two-option menu; (3) remove the sound and theme toggles (page no longer changes colour); (4) remove the white footer bar + the view dots.
+
+Work Log:
+- Re-analysed https://www.treehousestudio.com.br/ live with agent-browser and mapped the ball's three states: hero = blue bottom-centre; menu = charcoal top-centre flanked by portfolio|contact; full view = CREAM (rgb(232,224,213)) parked top-right (centre 112px from the right edge, x=1430 @1542px) with the same two labels flanking it; clicking the ball inside a view re-opens the split menu.
+- hub-button.tsx (rewritten): three resting states with the studio easing; viewport-aware `left` animation (centre ↔ vw-112) with x:"-50%" kept inside framer so hover-scale no longer fights the CSS translate; cream ball + zinc icon in full views; now owns BOTH label groups — menu state (centre, white/zinc) and view state (top-right, aria-current marks the active view); labels mount via AnimatePresence so hidden groups can't catch clicks.
+- Removed BackToHome (Studio pill) entirely; blue-stage logo and menu-overlay logo are now real buttons ("Tree House — back to studio intro") that goTo("hero"); the menu logo moved OUT of the clickable blue panel into its own overlay-layer button (no nested-button HTML).
+- Removed SoundToggle + ThemeToggle from the scene, deleted both files; command palette lost the theme/sound actions (useTheme import gone); cookie-consent copy no longer mentions sound/theme preferences.
+- Removed the white footer bar (brand line + NewsletterSignup + tags) and the ViewIndicator dots; deleted back-to-home.tsx / view-indicator.tsx / sound-toggle.tsx / theme-toggle.tsx (newsletter-signup.tsx kept — the lab view still uses it); status ticker stays.
+- Removed the numbered section markers ("03 — Studio" / "04 — Mood Board" / "05 — Connect") — relics of the sequential nav that collided with the parked ball; added pt-20/md:pt-24 to the studio/lab/contact scroll containers so their italic headers clear the logo.
+- QA (agent-browser): hero ball blue bottom-centre; click → charcoal centre menu with flanking labels; choose portfolio → ball glides right and turns cream (x=1430 — pixel-identical to the original site); click ball → two-option menu returns; contact from labels → same right-park; logo → hero; studio/lab via the menu's secondary row; Ctrl+K palette lists no theme/sound; Esc and ArrowRight keyboard flows intact; mobile (390px) stacks correctly with the ball parking at vw-112; zero console errors on a fresh load (the Radix useId hydration warning only appears during HMR edits, gone on reload); bun run lint clean; committed.
+
+Stage Summary:
+- Navigation now matches the original site's ball model exactly: bottom-centre blue → top-centre charcoal menu → top-right cream in views, with the labels riding along and the ball as the "back to choices" control. Home is the logo. Sound/theme/footer/dots are gone. Committed (48adcde).
+
+---
+Task ID: ui-3
+Agent: main (Z.ai Code) — portfolio lightbox rework + hero cleanup
+Task: User feedback (2 items): (1) remove the before/after comparison from the portfolio detail — clicking the image should open the info box, clicking the image again should expand it fullscreen, clicking again should return to the info box; (2) remove the "Est. Studio" corner text from the top-left of the hero.
+
+Work Log:
+- portfolio-lightbox.tsx (rewritten): BeforeAfterSlider removed entirely — every work now shows its single photo in the card. New zoom cycle: the photo side is a button (cursor-zoom-in, hover "Expand" chip with Maximize2 icon) that mounts a fullscreen layer (z-30, bg-charcoal-deep/95, object-contain, studio easing 0.45s scale+fade) with a "Click to return" chip; clicking it (cursor-zoom-out) or pressing Esc collapses back to the info card. Esc now steps zoom → card → close. Zoom state resets when navigating between works (←/→ chevrons and keyboard still work in both states; focus is handed between the expand/return buttons). Floating close X raised to z-40 so it stays reachable in fullscreen.
+- Deleted before-after-slider.tsx; removed `beforeImage` from types.ts and data/portfolio.ts (4 entries); git rm'd the 4 orphaned /works/work-N-wire.png assets.
+- dark-panel.tsx: removed the top-left "Est. Studio" corner index block (the vertical "TreeHouse Studio" edge marker and "— 2025" stay).
+- QA (agent-browser): lightbox opens with photo + spec sheet, no "DRAG TO COMPARE"/WIREFRAME remnants; click photo → fullscreen (hint chip visible); click again → info card returns; Esc steps fullscreen → card → closed; ←/→ navigation resets zoom correctly; hero shows no "Est. Studio" text; zero console/page errors; `bun run lint` clean. The bottom-strip "02 / 06" was inspected — it is the status ticker's message counter (2 of 6 rotating messages), not page pagination, so it stays. The hero's "01 — Studio" editorial index is original approved design, untouched. Committed (9e0d33c).
+
+Stage Summary:
+- Portfolio detail is now: info card ⇄ fullscreen photo via image clicks (Esc steps back/closes); the comparison slider feature is fully removed (component, data field, assets). Hero corner index gone. Lint clean, zero errors, committed.

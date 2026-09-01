@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Share2, X } from "lucide-react";
+import { Maximize2, Minimize2, Share2, X } from "lucide-react";
 import type { PortfolioItem, PortfolioSpec } from "../types";
 import { studioEase } from "../lib/motion";
-import { BeforeAfterSlider } from "./before-after-slider";
 
 interface PortfolioLightboxProps {
   item: PortfolioItem | null;
@@ -29,12 +28,15 @@ function specRows(spec?: PortfolioSpec) {
 /**
  * Portfolio detail lightbox.
  *
- * Opens when a tile is activated. Shows a large image (or an interactive
- * before/after slider when a wireframe is available), the project title,
- * category, year, description, a technical spec sheet, and a share button.
+ * Opens when a tile is activated: a card with the project photo on one
+ * side and the title, category, year, description, and technical spec
+ * sheet on the other, plus a share button.
  *
- * Keyboard: Esc closes, ←/→ step between works. Focus is trapped inside
- * the dialog while open. Body scroll is locked.
+ * Photo zoom cycle: clicking the photo expands it to a fullscreen view;
+ * clicking it again (or pressing Esc) returns to the info card.
+ *
+ * Keyboard: Esc steps zoom → card → close, ←/→ step between works.
+ * Focus is trapped inside the dialog while open. Body scroll is locked.
  */
 export function PortfolioLightbox({
   item,
@@ -42,29 +44,30 @@ export function PortfolioLightbox({
   onNavigate,
 }: PortfolioLightboxProps) {
   const [imgLoaded, setImgLoaded] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [zoomed, setZoomed] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const expandBtnRef = useRef<HTMLButtonElement>(null);
+  const zoomBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Reset the image-loaded state whenever the item changes.
+  // Reset the view state whenever the work changes.
   useEffect(() => {
     setImgLoaded(false);
+    setZoomed(false);
   }, [item?.id]);
 
   useEffect(() => {
     if (!item) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        // First Esc collapses the fullscreen photo; the next closes.
+        if (zoomed) {
+          setZoomed(false);
+          expandBtnRef.current?.focus();
+        } else {
+          onClose();
+        }
         return;
       }
-      // If the before/after slider handle is focused, let it own the
-      // arrow keys (to move the divider) instead of navigating works.
-      const active = document.activeElement as HTMLElement | null;
-      const isSliderHandle =
-        active?.getAttribute("role") === "slider" &&
-        active?.getAttribute("aria-label")?.includes("compare");
-      if (isSliderHandle) return;
-
       if (e.key === "ArrowRight") onNavigate(1);
       else if (e.key === "ArrowLeft") onNavigate(-1);
     };
@@ -77,10 +80,14 @@ export function PortfolioLightbox({
       document.body.style.overflow = "";
       clearTimeout(t);
     };
-  }, [item, onClose, onNavigate]);
+  }, [item, onClose, onNavigate, zoomed]);
+
+  // Hand focus to the fullscreen photo when it opens.
+  useEffect(() => {
+    if (zoomed) zoomBtnRef.current?.focus();
+  }, [zoomed]);
 
   const rows = specRows(item?.spec);
-  const hasSlider = !!(item?.image && item?.beforeImage);
 
   const handleShare = async () => {
     if (!item) return;
@@ -129,9 +136,39 @@ export function PortfolioLightbox({
             onClick={onClose}
           />
 
+          {/* Fullscreen photo layer — sits above the card while zoomed */}
+          <AnimatePresence>
+            {zoomed && item.image && (
+              <motion.button
+                ref={zoomBtnRef}
+                type="button"
+                onClick={() => {
+                  setZoomed(false);
+                  expandBtnRef.current?.focus();
+                }}
+                aria-label="Return to details"
+                className="absolute inset-0 z-30 flex cursor-zoom-out items-center justify-center bg-th-charcoal-deep/95 p-4 md:p-12"
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.03 }}
+                transition={{ duration: 0.45, ease: studioEase }}
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
+                  draggable={false}
+                />
+                <span className="pointer-events-none absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-white/90 backdrop-blur-sm">
+                  <Minimize2 className="h-3 w-3" />
+                  Click to return
+                </span>
+              </motion.button>
+            )}
+          </AnimatePresence>
+
           {/* Card */}
           <motion.div
-            ref={cardRef}
             key={item.id}
             className="relative z-10 grid max-h-[92vh] w-full max-w-5xl grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-2xl md:grid-cols-2"
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
@@ -139,7 +176,7 @@ export function PortfolioLightbox({
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.5, ease: studioEase }}
           >
-            {/* Image / slider side */}
+            {/* Photo side — click toggles the fullscreen zoom */}
             <div className="relative aspect-square w-full overflow-hidden bg-zinc-100 md:aspect-auto md:max-h-[92vh]">
               {/* Blur-up placeholder — fades out once content is ready */}
               {!imgLoaded && (
@@ -148,49 +185,36 @@ export function PortfolioLightbox({
                 </div>
               )}
 
-              {/* Content layer (slider or plain image) */}
+              {/* Photo layer */}
               <div
                 className={`absolute inset-0 transition-opacity duration-500 ${
                   imgLoaded ? "opacity-100" : "opacity-0"
                 }`}
               >
-                {hasSlider ? (
-                  <BeforeAfterSlider
-                    after={item.image!}
-                    before={item.beforeImage!}
-                    alt={item.title}
-                  />
-                ) : item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    onLoad={() => setImgLoaded(true)}
-                    className="h-full w-full object-cover"
-                    draggable={false}
-                  />
+                {item.image ? (
+                  <button
+                    ref={expandBtnRef}
+                    type="button"
+                    onClick={() => setZoomed(true)}
+                    aria-label={`Expand ${item.title} fullscreen`}
+                    className="group absolute inset-0 block h-full w-full cursor-zoom-in"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      onLoad={() => setImgLoaded(true)}
+                      className="h-full w-full object-cover"
+                      draggable={false}
+                    />
+                    <span className="pointer-events-none absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-th-charcoal/70 px-3 py-1 font-mono text-[9px] uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
+                      <Maximize2 className="h-3 w-3" />
+                      Expand
+                    </span>
+                  </button>
                 ) : (
                   <div className={`h-full w-full bg-gradient-to-br ${item.gradient}`} />
                 )}
               </div>
-
-              {/* For the slider case, mark as loaded shortly after mount
-                  (its images are cached from the tile grid). */}
-              {hasSlider && !imgLoaded && (
-                <img
-                  src={item.image}
-                  alt=""
-                  className="absolute h-0 w-0 opacity-0"
-                  onLoad={() => setImgLoaded(true)}
-                  aria-hidden="true"
-                />
-              )}
-
-              {/* Slider hint */}
-              {hasSlider && imgLoaded && (
-                <span className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 rounded-full bg-th-charcoal/70 px-3 py-1 font-mono text-[9px] uppercase tracking-wider text-white backdrop-blur-sm">
-                  Drag to compare
-                </span>
-              )}
 
               {/* Prev / Next chevrons */}
               <button
@@ -281,12 +305,12 @@ export function PortfolioLightbox({
               </div>
             </div>
 
-            {/* Close button (floating, top-right) */}
+            {/* Close button (floating, top-right — reachable in both states) */}
             <button
               type="button"
               onClick={onClose}
               aria-label="Close details"
-              className="absolute right-4 top-4 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-zinc-700 shadow-md backdrop-blur-sm transition-colors hover:bg-white hover:text-th-blue"
+              className="absolute right-4 top-4 z-40 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-zinc-700 shadow-md backdrop-blur-sm transition-colors hover:bg-white hover:text-th-blue"
             >
               <X className="h-4 w-4" />
             </button>

@@ -19,6 +19,8 @@ export interface PortfolioHandlers {
 interface BlueStageProps {
   view: ViewId;
   portfolioHandlers: PortfolioHandlers;
+  /** Navigate back to the hero (the logo is the home affordance). */
+  onHome: () => void;
 }
 
 /**
@@ -31,7 +33,7 @@ interface BlueStageProps {
  *
  * Inner content crossfades with AnimatePresence based on the active view.
  */
-export function BlueStage({ view, portfolioHandlers }: BlueStageProps) {
+export function BlueStage({ view, portfolioHandlers, onHome }: BlueStageProps) {
   const expanded = view !== "hero";
 
   return (
@@ -41,11 +43,15 @@ export function BlueStage({ view, portfolioHandlers }: BlueStageProps) {
         expanded ? "h-full w-full" : "h-0 w-full md:h-full md:w-0",
       )}
     >
-      {/* White logo — top-left, visible once expanded */}
-      <div
+      {/* White logo — top-left; clicking it returns to the studio intro */}
+      <button
+        type="button"
+        onClick={onHome}
+        aria-label="Tree House — back to studio intro"
+        data-cursor="link"
         className={cn(
-          "pointer-events-none absolute left-6 top-6 z-50 cursor-pointer transition-opacity duration-500 md:left-10 md:top-10",
-          expanded ? "opacity-100" : "opacity-0",
+          "absolute left-6 top-6 z-50 cursor-pointer transition-opacity duration-500 md:left-10 md:top-10",
+          expanded ? "opacity-100" : "pointer-events-none opacity-0",
         )}
       >
         <img
@@ -54,7 +60,7 @@ export function BlueStage({ view, portfolioHandlers }: BlueStageProps) {
           className="h-8 w-16 select-none object-contain md:h-10 md:w-20"
           draggable={false}
         />
-      </div>
+      </button>
 
       {/* Content layers */}
       <AnimatePresence mode="wait">
