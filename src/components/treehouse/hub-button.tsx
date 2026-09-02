@@ -21,11 +21,20 @@ interface HubButtonProps {
 
 /**
  * Geometry of the parked ball, faithful to the original site: on a full
- * view the ball rests at the top-RIGHT with its centre 112px from the
- * right edge (80px margin + half of the 64px ball), flanked by the
+ * view the ball rests at the top-RIGHT with its centre 108px from the
+ * right edge (80px margin + half of the 56px ball), flanked by the
  * "portfolio" / "contact" labels.
  */
-const BALL_CENTER_FROM_RIGHT = 112;
+const BALL_CENTER_FROM_RIGHT = 108;
+
+/**
+ * Where the mobile split menu puts its seam: the blue portfolio preview
+ * occupies the top 46% of the screen and the white contact panel the
+ * bottom 54% (see MenuOverlay). The open-menu ball rests centred on
+ * that line — the mobile mirror of the desktop, where it sits on the
+ * vertical seam between the two halves.
+ */
+const MOBILE_MENU_SEAM = "46%";
 
 /**
  * The TreeHouse hub button — the site's single persistent control.
@@ -63,8 +72,15 @@ export function HubButton({
   /** Full view (menu closed): the ball is parked at the top-right. */
   const parkedRight = atTop && !menuOpen;
 
+  /**
+   * Menu open on a phone: the split is horizontal, so instead of
+   * docking to the top (where it would sit on top of the preview
+   * images) the ball rides down to the seam between the two panels.
+   */
+  const mobileMenuOpen = menuOpen && vw > 0 && vw < 768;
+
   // On desktop the parked ball keeps the original geometry (centre
-  // 112px from the right edge); on mobile it docks closer to the edge
+  // 108px from the right edge); on mobile it docks closer to the edge
   // so it clears the narrower layouts.
   const rightOffset = vw >= 768 ? BALL_CENTER_FROM_RIGHT : 56;
   const ballX =
@@ -88,12 +104,13 @@ export function HubButton({
         aria-haspopup="dialog"
         data-cursor="link"
         data-cursor-label={menuOpen ? "close" : "menu"}
-        className="group absolute z-50 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full shadow-xl outline-none ring-th-blue/40 transition-colors duration-300 focus-visible:ring-4 md:h-16 md:w-16"
+        className="group absolute z-50 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full shadow-xl outline-none ring-th-blue/40 transition-colors duration-300 focus-visible:ring-4 md:h-14 md:w-14"
         initial={false}
         animate={{
           left: ballX,
           x: "-50%",
-          top: atTop ? 32 : "88%",
+          y: mobileMenuOpen ? "-50%" : "0%",
+          top: mobileMenuOpen ? MOBILE_MENU_SEAM : atTop ? 32 : "88%",
           backgroundColor: ballColor,
         }}
         transition={
@@ -136,7 +153,7 @@ export function HubButton({
         {menuOpen && (
           <motion.div
             key="hub-labels-menu"
-            className="pointer-events-none absolute inset-x-0 top-8 z-40 hidden h-16 md:block"
+            className="pointer-events-none absolute inset-x-0 top-7 z-40 hidden h-16 md:block"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.45, duration: 0.4 } }}
             exit={{ opacity: 0, transition: { duration: 0.25 } }}
@@ -145,7 +162,7 @@ export function HubButton({
               type="button"
               onClick={() => onGoTo("portfolio")}
               data-cursor="link"
-              className={`${labelClass} right-[calc(50%+3.25rem)] text-white/80 hover:text-white`}
+              className={`${labelClass} right-[calc(50%+3rem)] text-white/80 hover:text-white`}
             >
               portfolio
             </button>
@@ -153,7 +170,7 @@ export function HubButton({
               type="button"
               onClick={() => onGoTo("contact")}
               data-cursor="link"
-              className={`${labelClass} left-[calc(50%+3.25rem)] text-zinc-600 hover:text-zinc-900`}
+              className={`${labelClass} left-[calc(50%+3rem)] text-zinc-600 hover:text-zinc-900`}
             >
               contact
             </button>
@@ -166,7 +183,7 @@ export function HubButton({
         {parkedRight && (
           <motion.div
             key="hub-labels-view"
-            className="pointer-events-none absolute right-0 top-8 z-40 hidden h-16 w-72 md:block"
+            className="pointer-events-none absolute right-0 top-7 z-40 hidden h-16 w-72 md:block"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.5, duration: 0.4 } }}
             exit={{ opacity: 0, transition: { duration: 0.25 } }}
@@ -176,7 +193,7 @@ export function HubButton({
               onClick={() => onGoTo("portfolio")}
               data-cursor="link"
               aria-current={view === "portfolio" ? "true" : undefined}
-              className={`${labelClass} right-[10.25rem] ${
+              className={`${labelClass} right-[9.75rem] ${
                 view === "portfolio" ? "text-white" : "text-white/70 hover:text-white"
               }`}
             >

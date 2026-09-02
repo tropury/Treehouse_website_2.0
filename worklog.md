@@ -578,3 +578,22 @@ Stage Summary:
 - Mobile sem sobreposições: hero split vertical (carvão 1/3 + branco 2/3), chrome fixo com scrim, espaçamentos recalculados
 - Ícone de Shortcuts removido (desktop e mobile)
 - Arquivos: keyboard-hints.tsx (deletado), scene.tsx, dark-panel.tsx, hero-panel.tsx, hub-button.tsx, menu-overlay.tsx, blue-stage.tsx, portfolio/contact/studio/lab-content.tsx
+
+---
+Task ID: ui-m2
+Agent: main
+Task: Refino mobile pós-deploy — bola do menu sobrepondo as imagens no split; reduzir ênfase da bolinha
+
+Work Log:
+- Report do usuário (print anexado): no mobile, ao abrir o menu split, a bola subia para o topo e cobria as imagens do preview; deveria ficar "pelo meio entre o contato e o portfolio" como no desktop; e a bola estava grande demais
+- Diagnóstico: HubButton anima top:32px em todo estado atTop — no desktop isso a centra sobre a emenda VERTICAL (50% width); no mobile a emenda é HORIZONTAL (46% height), então top:32px a colocava DENTRO do painel azul, sobre o grid de preview (que ainda transbordava em viewports curtos ~390x718 por pt-24 + centering)
+- hub-button.tsx: novo estado mobileMenuOpen (menuOpen && vw<768) → bola anima para top:46% com y:"-50%" (centro exato na emenda, medido: ballCenter 313.72 == seam 313.72 em 390x718 e 371.67 == 371.67 em 390x844); desktop inalterado (top:32)
+- Bola reduzida: h-14→h-12 mobile (48px) e md:h-16→md:h-14 desktop (56px); BALL_CENTER_FROM_RIGHT 112→108 (mantém margem de 80px com a bola menor); labels flanqueados realinhados (top-8→top-7, calc(50%±3.25rem)→±3rem, right-[10.25rem]→right-[9.75rem]) para preservar gaps de 20px e centro y=60
+- menu-overlay.tsx: grid de preview pt-24→pt-16 pb-6 — topo agora só precisa limpar o logo (bola saiu de lá) e o pb reserva a zona da emenda para a bola em viewports curtos
+- QA agent-browser: 390x718 e 390x844 (menu aberto: bola na emenda, tiles limpos, watermark visível atrás; screenshots m2-menu-short/tall.png), portfolio e contact no mobile (bola estacionada 48px sem tocar chips/conteúdo), desktop 1440x900 (hero 56px centralizada, menu com labels alinhados y=60 e gaps 20px, estacionada cx=1332=108px da borda) — m2-dt-*.png; console sem erros
+- bun run lint limpo; commit b6f28ab
+
+Stage Summary:
+- Mobile: bola do menu agora descansa sobre a emenda entre portfolio e contato (espelho fiel do desktop), sem sobrepor imagens em nenhum viewport testado
+- Bolinha menor nos dois breakpoints, com geometria estacionada e labels recalculados
+- Pendência anterior mantida: env vars SMTP já no Vercel (usuário confirmou contato funcionando)

@@ -79,8 +79,11 @@ export function MenuOverlay({ open, onChoose, onClose, onHome }: MenuOverlayProp
               portfolio
             </span>
 
-            {/* Works grid (2×2) */}
-            <span className="absolute inset-0 flex items-center justify-center p-6 pt-24 md:p-16 md:pt-28">
+            {/* Works grid (2×2) — top padding clears the logo only (the
+                hub ball now rests on the seam, not over the preview);
+                bottom padding keeps the grid clear of the ball's upper
+                half on short viewports. */}
+            <span className="absolute inset-0 flex items-center justify-center p-6 pt-16 pb-6 md:p-16 md:pt-28 md:pb-16">
               <span className="grid w-full max-w-xl grid-cols-2 gap-3 md:gap-5">
                 {PREVIEW.map((item, i) => (
                   <motion.span
