@@ -501,3 +501,62 @@ Work Log:
 
 Stage Summary:
 - Site payload for works dropped from ~125 MB to 3.8 MB; menu animation no longer competes with image decode (idle preload + async decoding). Ghost /api route and 2 unreferenced assets removed; zero orphans across components/modules/routes. Masters backed up in master-assets/. Lint clean, QA clean, committed.
+
+---
+Task ID: fix-1
+Agent: main (Z.ai Code) — hydration mismatch fix (command palette)
+Task: User reported a console error: Radix useId hydration mismatch on the CommandDialog's DialogTitle/DialogDescription ids (server radix-_R_4p... vs client radix-_R_15...).
+
+Work Log:
+- Audited every component rendered before the palette for SSR/first-render divergence (page-intro, magnetic-cursor, keyboard-hints, back-to-top, scroll-progress-indicator, view-progress, use-scene, use-deep-link, dark-panel, hero-panel): all use the safe pattern (deterministic initial state + useEffect flips); no Math.random/Date.now/locale branches in render paths. Fresh load reproduced ZERO hydration errors — the warning surfaces when the tree re-renders mid-session (HMR in dev).
+- Root cause (structural): the current shadcn template renders CommandDialog's sr-only DialogHeader (DialogTitle + DialogDescription) as a direct child of DialogRoot, OUTSIDE DialogContent. Radix renders non-portal children even when closed, so those two useId consumers were permanently mounted from SSR through hydration — any tree-shape shift (e.g. HMR remount of an earlier sibling) moved their generated ids and surfaced the mismatch.
+- Fix (ui/command.tsx): moved DialogHeader INSIDE DialogContent. Closed dialog → portal renders nothing → no ids exist → nothing to mismatch. Open dialog → ids generate client-side at interaction time. This is the classic shadcn pattern and structurally eliminates the error class. Verified Radix consumers elsewhere are safe: faq accordion only mounts inside the lab view, Toaster sits after the page in layout order.
+- QA (agent-browser): fresh load → 0 hydration/error console messages; Ctrl+K opens the palette with Views/Portfolio/Actions groups and the title now inside dialog-content; selecting "Concrete House" closes the palette and opens the lightbox; Esc steps back; aria associations preserved (title/description inside content, Radix wires them via context). bun run lint clean. Committed (052d21c).
+
+Stage Summary:
+- Command palette ids no longer exist while the dialog is closed, so the Radix useId hydration mismatch the user saw cannot occur again. Palette functionality (search, groups, navigation) unchanged and verified. Committed.
+
+---
+Task ID: mail-1
+Agent: main
+Task: Explicar e implementar recebimento dos contatos do site no e-mail diego@treehousestudio.com.br (deploy no Vercel, domínio próprio, e-mail hospedado no Zoho Mail)
+
+Work Log:
+- Diagnóstico: formulário POST /api/contact salvava SOMENTE em SQLite local; nenhum e-mail era enviado; no Vercel o filesystem é read-only/efêmero → SQLite falha → mensagens perdidas (form provavelmente retornava 500 em produção)
+- MX do domínio: mx.zoho.com / mx2 / mx3 → e-mail do estúdio hospedado no Zoho Mail
+- Instalado nodemailer@9.1.1 + @types/nodemailer
+- Criado src/lib/mailer.ts: transport SMTP via env (SMTP_HOST/PORT/USER/PASS, CONTACT_TO default SMTP_USER), mailerConfigured gate, escapeHtml, shell/row templates HTML email-safe, sendContactNotification (assunto "[Site] Novo contato — Nome · Serviço", Reply-To do visitante), sendContactAutoReply (confirmação em inglês p/ visitante), sendNewsletterNotification, verifyTransport
+- /api/contact reescrito: e-mail = canal primário (falha de envio com SMTP configurado + DB falho = 500); auto-reply best-effort; SQLite best-effort (warn no log, não quebra); honeypot e validação zod mantidos
+- /api/newsletter reescrito com mesmo padrão (notificação + DB best-effort)
+- .env.example criado com instruções da app password do Zoho; .env local com placeholders comentados
+- Testes: POST sem SMTP → 201 via=database; honeypot 201 sem persistir; inválido 400; newsletter 201; registros confirmados no banco (2 QA Tester; bot bloqueado)
+- Teste end-to-end SMTP com Ethereal (scripts/test-mailer.ts): 3/3 e-mails SENT; preview validado visualmente (assunto com tag, Reply-To, card HTML com todos os campos) → tool-results/mail-notification-preview.png
+- Console da home verificado em carga fria: SEM erro de hidratação (o reportado antes era transitório do HMR)
+- bun run lint limpo; commit feat(contact)
+
+Stage Summary:
+- Contato e newsletter agora entregam no e-mail do estúdio via SMTP do próprio Zoho (sem serviço de terceiros)
+- Assunto com tag [Site] + Reply-To do visitante (responder direto da caixa)
+- Auto-resposta profissional enviada ao visitante
+- Formulário não quebra mais no Vercel (SQLite best-effort)
+- Pendência do usuário: gerar app password no Zoho (Security → App Passwords) e configurar SMTP_* nas env vars do Vercel
+
+---
+Task ID: mail-2
+Agent: main
+Task: Configurar SMTP real do Zoho (app password fornecida pelo usuário) + reduzir formulário de contato para 2 etapas (remover Scope)
+
+Work Log:
+- .env local reescrito com SMTP_HOST/PORT/USER/PASS (app password real) e CONTACT_TO — arquivo gitignored, confirmado com git check-ignore; commit NÃO contém a senha
+- ContactForm reescrito para 2 etapas: Contact (name/email/company) → Vision (message); removidos SERVICES/BUDGETS/TIMELINES, ChipGroup, PricingCalculator e watch/setValue/getValues não usados
+- pricing-calculator.tsx removido via git rm (ficava órfão)
+- service/budget/timeline tornados opcionais: mailer (payload + linhas condicionais + assunto simplificado para "[Site] Novo contato — Nome"), zod da API (service optional, payload ?? null), Prisma schema (service String?) + prisma db push + generate
+- Dev server reiniciado para carregar o novo .env
+- TESTE REAL via curl: POST /api/contact → {"ok":true,"via":"email","stored":true} — notificação entregue em diego@treehousestudio.com.br e auto-resposta enviada a diego_strey@hotmail.com; zero falhas/skips no dev.log
+- QA visual agent-browser: banner de cookies → menu → CONTACT; etapa 1 com indicador ① CONTACT — ② VISION; preenchi nome/email, avança para Vision (textarea + SEND BRIEF); screenshots tool-results/form-2step-{1,2}*.png; console sem erros
+- bun run lint limpo; commit 543e4c1
+
+Stage Summary:
+- Formulário de contato agora tem só 2 etapas (Scope com valores removido a pedido — detalhe a discutir após o primeiro contato)
+- SMTP Zoho operacional com credenciais reais: envios funcionam localmente
+- Pendência do usuário: replicar as 4 env vars no Vercel (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS) + push/redeploy

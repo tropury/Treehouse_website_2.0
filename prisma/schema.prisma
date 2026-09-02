@@ -37,7 +37,8 @@ model ContactInquiry {
   name      String
   email     String
   company   String?
-  service   String
+  /// Optional since the form no longer asks for scope up front.
+  service   String?
   budget    String?
   timeline  String?
   message   String

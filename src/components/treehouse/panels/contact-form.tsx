@@ -7,35 +7,21 @@ import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Check, ChevronLeft, Loader2 } from "lucide-react";
 import { studioEase } from "../lib/motion";
-import { PricingCalculator } from "./pricing-calculator";
 
 /**
- * ContactForm — a multi-step project planner.
+ * ContactForm — a two-step project brief.
  *
- * Three steps: contact basics → project scope → vision. Each step
- * validates before advancing. On submit, the inquiry is POSTed to
- * /api/contact which persists it. A success state with an animated
- * checkmark confirms submission.
+ * Two steps: contact basics → vision. Scope, budget and pricing are
+ * intentionally left out — those are discussed after the first
+ * contact. Each step validates before advancing. On submit, the
+ * inquiry is POSTed to /api/contact which e-mails the studio. A
+ * success state with an animated checkmark confirms submission.
  */
-
-const SERVICES = [
-  "Architectural Visualization",
-  "Interior Visualization",
-  "Concept Art",
-  "Animation",
-  "Other",
-] as const;
-
-const BUDGETS = ["< $5k", "$5k – $15k", "$15k – $40k", "$40k+"] as const;
-const TIMELINES = ["ASAP", "1–3 months", "3+ months", "Flexible"] as const;
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your name."),
   email: z.string().email("Please enter a valid email."),
   company: z.string().optional(),
-  service: z.string().min(1, "Please choose a service."),
-  budget: z.string().min(1, "Select a budget range."),
-  timeline: z.string().min(1, "Select a timeline."),
   message: z
     .string()
     .min(10, "Tell us a little more (min 10 chars).")
@@ -46,7 +32,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const STEPS = ["Contact", "Scope", "Vision"] as const;
+const STEPS = ["Contact", "Vision"] as const;
 
 export function ContactForm() {
   const [step, setStep] = useState(0);
@@ -58,9 +44,6 @@ export function ContactForm() {
     register,
     handleSubmit,
     trigger,
-    setValue,
-    watch,
-    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -69,9 +52,6 @@ export function ContactForm() {
       name: "",
       email: "",
       company: "",
-      service: "",
-      budget: "",
-      timeline: "",
       message: "",
       website: "",
     },
@@ -80,7 +60,6 @@ export function ContactForm() {
   const next = async () => {
     const fields: (keyof FormValues)[][] = [
       ["name", "email"],
-      ["service", "budget", "timeline"],
       ["message"],
     ];
     const valid = await trigger(fields[step]);
@@ -239,48 +218,6 @@ export function ContactForm() {
               transition={{ duration: 0.35, ease: studioEase }}
               className="space-y-4"
             >
-              <Field label="Service" error={errors.service?.message}>
-                <ChipGroup
-                  name="service"
-                  options={[...SERVICES]}
-                  value={watch("service")}
-                  onSelect={(v) => setValue("service", v, { shouldValidate: true })}
-                />
-              </Field>
-              <Field label="Budget" error={errors.budget?.message}>
-                <ChipGroup
-                  name="budget"
-                  options={[...BUDGETS]}
-                  value={watch("budget")}
-                  onSelect={(v) => setValue("budget", v, { shouldValidate: true })}
-                />
-              </Field>
-              <Field label="Timeline" error={errors.timeline?.message}>
-                <ChipGroup
-                  name="timeline"
-                  options={[...TIMELINES]}
-                  value={watch("timeline")}
-                  onSelect={(v) => setValue("timeline", v, { shouldValidate: true })}
-                />
-              </Field>
-
-              {/* Real-time scope estimator */}
-              <PricingCalculator
-                service={watch("service")}
-                budget={watch("budget")}
-                timeline={watch("timeline")}
-              />
-            </motion.div>
-          )}
-          {step === 2 && (
-            <motion.div
-              key="step-2"
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
-              transition={{ duration: 0.35, ease: studioEase }}
-              className="space-y-4"
-            >
               <Field
                 label="Tell us about your project"
                 error={errors.message?.message}
@@ -361,42 +298,5 @@ function Field({
         <span className="mt-1 block text-xs text-red-300">{error}</span>
       )}
     </label>
-  );
-}
-
-/** A group of selectable pill chips for a single-choice field. */
-function ChipGroup({
-  name,
-  options,
-  value,
-  onSelect,
-}: {
-  name: string;
-  options: string[];
-  value: string;
-  onSelect: (value: string) => void;
-}) {
-  return (
-    <div role="radiogroup" aria-label={name} className="flex flex-wrap gap-2">
-      {options.map((opt) => {
-        const active = value === opt;
-        return (
-          <button
-            key={opt}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            onClick={() => onSelect(opt)}
-            className={`rounded-full px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-all duration-200 ${
-              active
-                ? "bg-white text-th-blue-deep shadow-md"
-                : "bg-white/10 text-white/70 hover:bg-white/20"
-            }`}
-          >
-            {opt}
-          </button>
-        );
-      })}
-    </div>
   );
 }
