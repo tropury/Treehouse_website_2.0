@@ -8,19 +8,19 @@ import type { PortfolioItem } from "../types";
 export const portfolio: PortfolioItem[] = [
   {
     id: "concrete-house",
-    title: "Concrete House",
+    title: "New York Penthouse",
     category: "Architecture",
     gradient: "from-zinc-100 to-zinc-300",
     accent: "#1d4ed8",
     image: "/works/work-1.webp",
-    year: "2024",
+    year: "2025",
     description:
-      "A monolithic concrete residence where raw material meets warm interior light at dusk.",
+      "A residence where raw material meets warm interior light at dusk.",
     spec: {
       client: "Private",
-      location: "Porto Alegre, BR",
+      location: "New York, EUA",
       software: "3ds Max, Corona",
-      scope: "Exterior render",
+      scope: "interior render",
       deliverable: "4K · 8 frames",
     },
   },

@@ -114,7 +114,7 @@ export function DarkPanel({ active }: DarkPanelProps) {
 
       {/* Bottom corner coordinates */}
       <div className="absolute bottom-6 left-6 z-10 hidden font-mono text-[10px] tracking-wider text-th-cream/30 md:block">
-        — 2025
+        — 2026
       </div>
     </motion.div>
   );
