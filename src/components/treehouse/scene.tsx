@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useScene } from "./lib/use-scene";
 import { useDeepLink } from "./lib/use-deep-link";
 import { DarkPanel } from "./panels/dark-panel";
@@ -79,6 +79,33 @@ export function TreeHouseScene() {
 
   // Wire up deep links (#work-<id>).
   useDeepLink({ goTo, openWork: openWorkById, closeWork });
+
+  // Warm the browser cache for the four works the menu previews show.
+  // They download+decode while the visitor reads the hero (during idle),
+  // so the menu panel animation never competes with image work.
+  useEffect(() => {
+    const w = window as Window & {
+      requestIdleCallback?: (
+        cb: () => void,
+        opts?: { timeout: number },
+      ) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    const warm = () => {
+      portfolio.slice(0, 4).forEach((p) => {
+        if (!p.image) return;
+        const img = new Image();
+        img.decoding = "async";
+        img.src = p.image;
+      });
+    };
+    if (typeof w.requestIdleCallback === "function") {
+      const handle = w.requestIdleCallback(warm, { timeout: 3500 });
+      return () => w.cancelIdleCallback?.(handle);
+    }
+    const t = setTimeout(warm, 1200);
+    return () => clearTimeout(t);
+  }, []);
 
   // Pass open/navigate down to the portfolio content via context-like props.
   const portfolioHandlers = useMemo(

@@ -92,6 +92,7 @@ export function PortfolioTile({
           src={item.image}
           alt={item.title}
           loading="lazy"
+          decoding="async"
           onLoad={() => setLoaded(true)}
           className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
             loaded ? "opacity-100 blur-0" : "opacity-0 blur-md"

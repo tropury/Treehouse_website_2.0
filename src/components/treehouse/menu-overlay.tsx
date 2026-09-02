@@ -100,6 +100,7 @@ export function MenuOverlay({ open, onChoose, onClose, onHome }: MenuOverlayProp
                         src={item.image}
                         alt={item.title}
                         loading="lazy"
+                        decoding="async"
                         draggable={false}
                         className="h-full w-full select-none object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover/p:scale-[1.06]"
                       />

@@ -12,7 +12,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Architecture",
     gradient: "from-zinc-100 to-zinc-300",
     accent: "#1d4ed8",
-    image: "/works/work-1.png",
+    image: "/works/work-1.webp",
     year: "2024",
     description:
       "A monolithic concrete residence where raw material meets warm interior light at dusk.",
@@ -30,7 +30,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Interior",
     gradient: "from-blue-50 to-blue-100",
     accent: "#2563eb",
-    image: "/works/work-2.png",
+    image: "/works/work-2.webp",
     year: "2024",
     description:
       "An open-plan living space balancing natural wood, daylight, and scandinavian restraint.",
@@ -48,7 +48,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Exterior",
     gradient: "from-stone-100 to-stone-300",
     accent: "#1e3a8a",
-    image: "/works/work-3.png",
+    image: "/works/work-3.webp",
     year: "2023",
     description:
       "A contemporary villa rendered at blue hour, its infinity pool mirroring the geometry above.",
@@ -66,7 +66,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Interior",
     gradient: "from-slate-100 to-slate-300",
     accent: "#3b82f6",
-    image: "/works/work-4.png",
+    image: "/works/work-4.webp",
     year: "2023",
     description:
       "A minimalist bedroom in soft morning light — Japandi calm, linen, concrete, and wood.",
@@ -84,7 +84,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Interior",
     gradient: "from-neutral-100 to-neutral-300",
     accent: "#1d4ed8",
-    image: "/works/work-5.png",
+    image: "/works/work-5.webp",
     year: "2024",
     description:
       "A sculptural kitchen of marble, brass, and dark cabinetry under dramatic lighting.",
@@ -102,7 +102,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Architecture",
     gradient: "from-zinc-100 to-blue-50",
     accent: "#2563eb",
-    image: "/works/work-6.png",
+    image: "/works/work-6.webp",
     year: "2022",
     description:
       "An aerial view of a geometric concrete museum, framed by its plaza and trees.",
@@ -120,7 +120,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Concept",
     gradient: "from-stone-100 to-blue-50",
     accent: "#1e40af",
-    image: "/works/work-7.png",
+    image: "/works/work-7.webp",
     year: "2023",
     description:
       "An exploratory mood study exploring atmosphere, light, and spatial persuasion.",
@@ -138,7 +138,7 @@ export const portfolio: PortfolioItem[] = [
     category: "Render",
     gradient: "from-slate-100 to-zinc-200",
     accent: "#1d4ed8",
-    image: "/works/work-8.png",
+    image: "/works/work-8.webp",
     year: "2022",
     description:
       "A close material study — texture, junction, and shadow composed into a single frame.",

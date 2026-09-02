@@ -157,6 +157,7 @@ export function PortfolioLightbox({
                   src={item.image}
                   alt={item.title}
                   className="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
+                  decoding="async"
                   draggable={false}
                 />
                 <span className="pointer-events-none absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-white/90 backdrop-blur-sm">
@@ -204,6 +205,7 @@ export function PortfolioLightbox({
                       alt={item.title}
                       onLoad={() => setImgLoaded(true)}
                       className="h-full w-full object-cover"
+                      decoding="async"
                       draggable={false}
                     />
                     <span className="pointer-events-none absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-th-charcoal/70 px-3 py-1 font-mono text-[9px] uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">

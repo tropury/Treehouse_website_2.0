@@ -485,3 +485,19 @@ Work Log:
 
 Stage Summary:
 - Portfolio detail is now: info card ⇄ fullscreen photo via image clicks (Esc steps back/closes); the comparison slider feature is fully removed (component, data field, assets). Hero corner index gone. Lint clean, zero errors, committed.
+
+---
+Task ID: perf-1
+Agent: main (Z.ai Code) — menu jank fix + full site checkup
+Task: User reported the menu animations feel stuck (suspecting image weight, planning to convert to WebP later) and asked for a general checkup for ghost pages and unallocated/broken items.
+
+Work Log:
+- Diagnosis confirmed: the 8 work images were 4000px PNG masters totalling ~125 MB (work-2 alone = 24.6 MB). The menu mounts 4 preview tiles, so download+decode of ~90 MB fired exactly during the panel animation → main-thread stall = the "travada".
+- Converted every work to WebP (max long edge 2560px, quality 82, Lanczos, EXIF-safe) via the persisted script scripts/convert-works-webp.py: total now 3.8 MB (124–941 KB each) — a 97% cut. Original PNGs preserved in master-assets/works/ (git mv, history intact); data/portfolio.ts paths updated to .webp. If sharper fullscreen exports are wanted later, drop new masters in master-assets/works/ and re-run the script.
+- scene.tsx: added a requestIdleCallback effect (setTimeout fallback) that warms the cache for the first 4 work images while the visitor reads the hero — the menu now opens with tiles already downloaded/decoded.
+- Added decoding="async" to all portfolio imgs (menu previews, grid tiles, lightbox card + fullscreen) so decode stays off the main thread.
+- Full checkup results: (a) removed the scaffold ghost route src/app/api/route.ts ("Hello, world!" GET /api); (b) moved unreferenced public assets to master-assets/ — logo.svg (1.4 MB, zero references) and treehouse-logo-blue.png (left over from the old nav orb); (c) verified NO orphaned components/modules — every file in components/treehouse (incl. ThemeProvider in layout, NewsletterSignup in lab) is imported and working; (d) route smoke tests: /, /sitemap.xml, /robots.txt, /opengraph-image, favicon all 200; unknown page → custom 404; /api → 404 after cleanup; /api/newsletter + /api/contact → 405 on GET (POST-only, correct); old .png URLs 404 with no remaining references.
+- Browser QA: menu opens with all 4 webp tiles pre-loaded (network shows the idle warm requests); portfolio grid renders 8/8 webp tiles with 0 broken images; lightbox fullscreen shows the 2560px webp sharp; deep link #work-villa-dusk opens the lightbox directly; custom 404 renders; zero console/page errors; bun run lint clean. Committed (a76538f).
+
+Stage Summary:
+- Site payload for works dropped from ~125 MB to 3.8 MB; menu animation no longer competes with image decode (idle preload + async decoding). Ghost /api route and 2 unreferenced assets removed; zero orphans across components/modules/routes. Masters backed up in master-assets/. Lint clean, QA clean, committed.
