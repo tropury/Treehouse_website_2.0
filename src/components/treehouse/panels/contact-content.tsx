@@ -13,8 +13,7 @@ interface ContactContentProps {
 const MARQUEE_WORDS = [
   "VISUAL PERSUASION",
   "TREEHOUSE STUDIO",
-  "EST. STUDIO",
-  "ARCHITECTURE",
+   "ARCHITECTURE",
   "INTERIOR",
   "ART",
 ];
