@@ -10,7 +10,6 @@ import { HubButton } from "./hub-button";
 import { MenuOverlay } from "./menu-overlay";
 import { MagneticCursor } from "./magnetic-cursor";
 import { PageIntro } from "./page-intro";
-import { KeyboardHints } from "./keyboard-hints";
 import { ViewProgress } from "./view-progress";
 import { StatusTicker } from "./status-ticker";
 import { ScrollProgressIndicator } from "./scroll-progress-indicator";
@@ -114,7 +113,7 @@ export function TreeHouseScene() {
   );
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-white font-sans text-zinc-800 selection:bg-th-blue/20">
+    <div className="relative flex min-h-dvh flex-col bg-white font-sans text-zinc-800 selection:bg-th-blue/20">
       {/* View-transition progress bar */}
       <ViewProgress view={view} />
 
@@ -123,9 +122,6 @@ export function TreeHouseScene() {
 
       {/* Custom magnetic cursor (desktop only) */}
       <MagneticCursor />
-
-      {/* Keyboard shortcut legend */}
-      <KeyboardHints />
 
       {/* Scroll-position indicator for long panels */}
       <ScrollProgressIndicator />

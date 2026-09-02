@@ -26,7 +26,7 @@ export function StudioContent({ visible }: StudioContentProps) {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   return (
-    <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-20 md:px-16 md:pt-24">
+    <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-24 md:px-16 md:pt-24">
       {/* Section label */}
       <motion.div
         className="mb-4 flex items-baseline gap-4"

@@ -62,6 +62,16 @@ export function BlueStage({ view, portfolioHandlers, onHome }: BlueStageProps) {
         />
       </button>
 
+      {/* Mobile scrim — scrolled content fades out before reaching the
+          fixed logo (top-left) and hub ball (top-right), so nothing
+          collides with the chrome on small screens. */}
+      {expanded && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 z-40 h-28 bg-gradient-to-t from-transparent via-th-blue/70 to-th-blue md:hidden"
+        />
+      )}
+
       {/* Content layers */}
       <AnimatePresence mode="wait">
         {view === "portfolio" && (

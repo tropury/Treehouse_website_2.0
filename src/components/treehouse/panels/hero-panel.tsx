@@ -37,7 +37,7 @@ const HEADLINE_LINES: {
 export function HeroPanel({ active }: HeroPanelProps) {
   return (
     <div
-      className="absolute right-0 top-0 z-10 flex h-1/2 w-full flex-col items-center justify-center overflow-hidden bg-white p-8 md:h-full md:w-1/2 md:p-16"
+      className="absolute bottom-0 right-0 top-auto z-10 flex h-2/3 w-full flex-col items-center justify-center overflow-hidden bg-white p-8 pb-24 md:bottom-auto md:top-0 md:h-full md:w-1/2 md:pb-16 md:p-16"
       aria-hidden={!active}
       style={{ pointerEvents: active ? "auto" : "none" }}
     >

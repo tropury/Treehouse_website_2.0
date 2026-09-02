@@ -13,7 +13,8 @@ interface ContactContentProps {
 const MARQUEE_WORDS = [
   "VISUAL PERSUASION",
   "TREEHOUSE STUDIO",
-   "ARCHITECTURE",
+  "EST. STUDIO",
+  "ARCHITECTURE",
   "INTERIOR",
   "ART",
 ];
@@ -33,7 +34,7 @@ export function ContactContent({ visible }: ContactContentProps) {
   const ticker = [...MARQUEE_WORDS, ...MARQUEE_WORDS];
 
   return (
-    <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-20 md:px-12 md:pt-24">
+    <div className="th-scroll relative h-full w-full overflow-y-auto px-6 pb-28 pt-24 md:px-12 md:pt-24">
       {/* Marquee background ticker */}
       <div
         className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none overflow-hidden"

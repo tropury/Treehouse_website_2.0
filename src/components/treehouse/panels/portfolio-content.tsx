@@ -63,8 +63,9 @@ export function PortfolioContent({ visible, handlers }: PortfolioContentProps) {
         </span>
       </div>
 
-      {/* Small italic label */}
-      <div className="absolute left-1/2 top-5 z-30 -translate-x-1/2 font-serif text-lg italic text-white md:top-6">
+      {/* Small italic label (desktop — on mobile the top strip is
+          reserved for the fixed logo / hub ball chrome) */}
+      <div className="absolute left-1/2 top-5 z-30 hidden -translate-x-1/2 font-serif text-lg italic text-white md:top-6 md:block">
         portfolio
       </div>
 
@@ -89,7 +90,7 @@ export function PortfolioContent({ visible, handlers }: PortfolioContentProps) {
 
       {/* Category filter chips */}
       <motion.div
-        className="relative z-20 mx-auto mb-5 flex flex-wrap items-center justify-center gap-2 pt-14 md:mb-6 md:pt-16"
+        className="relative z-20 mx-auto mb-5 flex flex-wrap items-center justify-center gap-2 pt-[72px] md:mb-6 md:pt-16"
         initial={{ opacity: 0, y: -8 }}
         animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
         transition={{ duration: 0.5, ease: studioEase, delay: 0.4 }}

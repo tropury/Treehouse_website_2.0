@@ -59,7 +59,7 @@ Task: Assess project status, QA via agent-browser, then elevate styling to a pre
 ### Styling improvements (mandatory #4)
 - **Custom magnetic cursor** (`magnetic-cursor.tsx`): a precise dot + spring-trailed ring that expands and labels the target on hover (`data-cursor` / `data-cursor-label` attributes). Desktop-only, respects reduced-motion. Wired into tiles (`view`), links (`open`).
 - **Hero typography rhythm** (`hero-panel.tsx`): the verbatim headline "We Make / Visual / Persuasion / & Some Art" now uses varied weight/size/style per line (light → black → serif italic blue → bold) for editorial hierarchy. Added a divider, paper grain, and editorial corner indices ("01 — Studio", "Visual Persuasion").
-- **Atmospheric depth** (`dark-panel.tsx`): layered radial vignette + ambient blue glow bleeding from the seam + logo drop-shadow, so the charcoal panel reads as printed/tactile rather than a flat fill. Added "Est. Studio" / "— 2026" corner markers.
+- **Atmospheric depth** (`dark-panel.tsx`): layered radial vignette + ambient blue glow bleeding from the seam + logo drop-shadow, so the charcoal panel reads as printed/tactile rather than a flat fill. Added "Est. Studio" / "— 2025" corner markers.
 - **Portfolio reveal-mask hover + ghost typography** (`portfolio-tile.tsx`, `portfolio-content.tsx`): tiles now use real images with a sliding gradient overlay that lifts to reveal the title + year; category chip + corner accent glow on hover. Ambient words ("form", "light", "space", "render") drift behind the grid at 4% opacity.
 - **Animated contact underlines** (`contact-content.tsx`): pure-CSS underline that draws left-to-right with the studio easing on hover. Added a "04 — Connect" section index.
 - **Page-load curtain intro** (`page-intro.tsx`): one-time charcoal curtain with the logo + wordmark reveal + progress line that sweeps up after ~1.9s. Session-guarded (runs once per session) and skipped for reduced-motion.
@@ -480,7 +480,7 @@ Task: User feedback (2 items): (1) remove the before/after comparison from the p
 Work Log:
 - portfolio-lightbox.tsx (rewritten): BeforeAfterSlider removed entirely — every work now shows its single photo in the card. New zoom cycle: the photo side is a button (cursor-zoom-in, hover "Expand" chip with Maximize2 icon) that mounts a fullscreen layer (z-30, bg-charcoal-deep/95, object-contain, studio easing 0.45s scale+fade) with a "Click to return" chip; clicking it (cursor-zoom-out) or pressing Esc collapses back to the info card. Esc now steps zoom → card → close. Zoom state resets when navigating between works (←/→ chevrons and keyboard still work in both states; focus is handed between the expand/return buttons). Floating close X raised to z-40 so it stays reachable in fullscreen.
 - Deleted before-after-slider.tsx; removed `beforeImage` from types.ts and data/portfolio.ts (4 entries); git rm'd the 4 orphaned /works/work-N-wire.png assets.
-- dark-panel.tsx: removed the top-left "Est. Studio" corner index block (the vertical "TreeHouse Studio" edge marker and "— 2026" stay).
+- dark-panel.tsx: removed the top-left "Est. Studio" corner index block (the vertical "TreeHouse Studio" edge marker and "— 2025" stay).
 - QA (agent-browser): lightbox opens with photo + spec sheet, no "DRAG TO COMPARE"/WIREFRAME remnants; click photo → fullscreen (hint chip visible); click again → info card returns; Esc steps fullscreen → card → closed; ←/→ navigation resets zoom correctly; hero shows no "Est. Studio" text; zero console/page errors; `bun run lint` clean. The bottom-strip "02 / 06" was inspected — it is the status ticker's message counter (2 of 6 rotating messages), not page pagination, so it stays. The hero's "01 — Studio" editorial index is original approved design, untouched. Committed (9e0d33c).
 
 Stage Summary:
@@ -560,3 +560,21 @@ Stage Summary:
 - Formulário de contato agora tem só 2 etapas (Scope com valores removido a pedido — detalhe a discutir após o primeiro contato)
 - SMTP Zoho operacional com credenciais reais: envios funcionam localmente
 - Pendência do usuário: replicar as 4 env vars no Vercel (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS) + push/redeploy
+
+---
+Task ID: ui-m1
+Agent: main
+Task: Remover ícone de Shortcuts + corrigir sobreposições da versão mobile do site
+
+Work Log:
+- Removido KeyboardHints (botão de teclado canto inferior esquerdo + painel de atalhos): git rm do componente e referências limpas de scene.tsx/command-palette.tsx (Cmd+K segue funcionando, invisível)
+- QA mobile com agent-browser (emulação iPhone 14): mapeados 6 problemas — hero com DarkPanel invisível (DarkPanel e HeroPanel ambos em top-0 h-1/2; o branco pintava por cima), bola solta em área branca vazia, StatusTicker cortado (min-h-screen vs viewport dinâmico), bola sobre tiles do menu, bola sobre título/chips do portfolio, logo/bola sobre conteúdo rolado
+- Correções: DarkPanel h-1/3 (banda superior compacta, logo h-24) + HeroPanel bottom-0 h-2/3; scene root min-h-dvh; HubButton com offset mobile (56px vs 112px desktop); menu tiles pt-24 e socials zinc-400 no mobile; scrim gradiente h-28 via-th-blue/70 no BlueStage (conteúdo dissolve sob logo/bola); pt-24 nos wrappers th-scroll de contact/studio/lab e chips do portfolio pt-[72px]; mini-label "portfolio" só desktop
+- "Blob azul" investigado no topo: era a ViewProgress de 2px em DPR 3 — não é bug
+- Re-QA: hero/menu/portfolio/contact sem sobreposições; scrim validado por amostragem de pixels; desktop 1440x900 sem regressões (split hero, labels, ticker, counter 03/06); console limpo
+- bun run lint limpo; commit 95fb715
+
+Stage Summary:
+- Mobile sem sobreposições: hero split vertical (carvão 1/3 + branco 2/3), chrome fixo com scrim, espaçamentos recalculados
+- Ícone de Shortcuts removido (desktop e mobile)
+- Arquivos: keyboard-hints.tsx (deletado), scene.tsx, dark-panel.tsx, hero-panel.tsx, hub-button.tsx, menu-overlay.tsx, blue-stage.tsx, portfolio/contact/studio/lab-content.tsx

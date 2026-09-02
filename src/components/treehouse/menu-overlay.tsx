@@ -80,7 +80,7 @@ export function MenuOverlay({ open, onChoose, onClose, onHome }: MenuOverlayProp
             </span>
 
             {/* Works grid (2×2) */}
-            <span className="absolute inset-0 flex items-center justify-center p-6 pt-16 md:p-16 md:pt-28">
+            <span className="absolute inset-0 flex items-center justify-center p-6 pt-24 md:p-16 md:pt-28">
               <span className="grid w-full max-w-xl grid-cols-2 gap-3 md:gap-5">
                 {PREVIEW.map((item, i) => (
                   <motion.span
@@ -159,7 +159,7 @@ export function MenuOverlay({ open, onChoose, onClose, onHome }: MenuOverlayProp
                   onClick={(e) => e.stopPropagation()}
                   data-cursor="link"
                   data-cursor-label="open"
-                  className="group/s flex items-baseline gap-2 text-zinc-300 transition-colors duration-300 hover:text-zinc-900"
+                  className="group/s flex items-baseline gap-2 text-zinc-400 transition-colors duration-300 hover:text-zinc-900 md:text-zinc-300"
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
@@ -172,7 +172,7 @@ export function MenuOverlay({ open, onChoose, onClose, onHome }: MenuOverlayProp
                   <span className="text-2xl font-bold tracking-tight md:text-4xl">
                     {social.label}
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400 opacity-0 transition-opacity duration-300 group-hover/s:opacity-100">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500 opacity-0 transition-opacity duration-300 group-hover/s:opacity-100 md:text-zinc-400">
                     {social.tag}
                   </span>
                 </motion.a>

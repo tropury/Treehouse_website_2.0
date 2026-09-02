@@ -35,9 +35,7 @@ interface CommandPaletteProps {
  *
  * Opens a modal with fuzzy search across views, portfolio works, and
  * a back-to-hero action. Selecting a result navigates or triggers the
- * action. Pairs naturally with the existing keyboard-hints legend.
- *
- * Triggered by Cmd+K (macOS) / Ctrl+K (other).
+ * action. Triggered by Cmd+K (macOS) / Ctrl+K (other).
  */
 export function CommandPalette({ goTo, openWork }: CommandPaletteProps) {
   const [open, setOpen] = useState(false);

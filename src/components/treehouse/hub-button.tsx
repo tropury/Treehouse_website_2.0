@@ -63,8 +63,16 @@ export function HubButton({
   /** Full view (menu closed): the ball is parked at the top-right. */
   const parkedRight = atTop && !menuOpen;
 
+  // On desktop the parked ball keeps the original geometry (centre
+  // 112px from the right edge); on mobile it docks closer to the edge
+  // so it clears the narrower layouts.
+  const rightOffset = vw >= 768 ? BALL_CENTER_FROM_RIGHT : 56;
   const ballX =
-    parkedRight && vw > 0 ? vw - BALL_CENTER_FROM_RIGHT : vw === 0 ? "50%" : vw / 2;
+    parkedRight && vw > 0
+      ? vw - rightOffset
+      : vw === 0
+        ? "50%"
+        : vw / 2;
   const ballColor = parkedRight ? "#e8e0d5" : atTop ? "#27272a" : "#2563eb";
 
   const labelClass =

@@ -117,7 +117,8 @@ export function ContactForm() {
           Thank you.
         </h4>
         <p className="mt-2 max-w-sm text-sm text-white/70">
-          Your brief is on its way to the studio. We&apos;ll respond really soon.
+          Your brief is on its way to the studio. We&apos;ll respond within
+          24&nbsp;hours.
         </p>
       </motion.div>
     );
@@ -185,7 +186,7 @@ export function ContactForm() {
               <Field label="Your name" error={errors.name?.message}>
                 <input
                   {...register("name")}
-                  placeholder="Your Name"
+                  placeholder="Jane Doe"
                   className="th-input"
                   aria-invalid={!!errors.name}
                 />
@@ -194,7 +195,7 @@ export function ContactForm() {
                 <input
                   type="email"
                   {...register("email")}
-                  placeholder="email@studio.com"
+                  placeholder="jane@studio.com"
                   className="th-input"
                   aria-invalid={!!errors.email}
                 />
@@ -202,7 +203,7 @@ export function ContactForm() {
               <Field label="Company (optional)" error={undefined}>
                 <input
                   {...register("company")}
-                  placeholder="Studio / Firm / Company"
+                  placeholder="Studio / Firm"
                   className="th-input"
                 />
               </Field>

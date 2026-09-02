@@ -69,7 +69,7 @@ export function DarkPanel({ active }: DarkPanelProps) {
   return (
     <motion.div
       ref={ref}
-      className="th-grain absolute left-0 top-0 z-10 flex h-1/2 w-full items-center justify-center overflow-hidden bg-th-charcoal md:h-full md:w-1/2"
+      className="th-grain absolute left-0 top-0 z-10 flex h-1/3 w-full items-center justify-center overflow-hidden bg-th-charcoal md:h-full md:w-1/2"
       animate={{ opacity: active ? 1 : 0 }}
       transition={{ duration: 0.7, ease: studioEase }}
       aria-hidden={!active}
@@ -89,7 +89,7 @@ export function DarkPanel({ active }: DarkPanelProps) {
       <motion.img
         src="/treehouse-logo.png"
         alt="Tree House"
-        className="relative z-10 h-32 w-32 select-none object-contain drop-shadow-[0_8px_30px_rgba(0,0,0,0.5)] md:h-48 md:w-48"
+        className="relative z-10 h-24 w-24 select-none object-contain drop-shadow-[0_8px_30px_rgba(0,0,0,0.5)] md:h-48 md:w-48"
         variants={fade}
         initial="hidden"
         animate={active ? "visible" : "hidden"}
@@ -114,7 +114,7 @@ export function DarkPanel({ active }: DarkPanelProps) {
 
       {/* Bottom corner coordinates */}
       <div className="absolute bottom-6 left-6 z-10 hidden font-mono text-[10px] tracking-wider text-th-cream/30 md:block">
-        — 2026
+        — 2025
       </div>
     </motion.div>
   );

@@ -246,7 +246,7 @@ export async function sendContactAutoReply(
   const text = [
     `Hi ${data.name},`,
     "",
-    "We received your brief and will get back to you really soon.",
+    "We received your project brief and will get back to you within 24 hours.",
     "",
     "— TreeHouse Studio · we make visuals",
   ].join("\n");
